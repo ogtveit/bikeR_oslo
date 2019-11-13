@@ -38,12 +38,12 @@ fetch_from_api <- function() {
   station_information <- GET(paste(api_base, "station_information.json", sep=""),  add_headers("client-name" = client_header))
   station_status <- GET(paste(api_base, "station_status.json", sep=""), add_headers("client-name" = client_header))
   
-  fetched_at <- station_information$date
-  
-  # stop if http error
+    # stop if http error
   if (http_error(station_information) | http_error(station_status)) {
-    stop("HTTP Error when fetching JSON from https://gbfs.urbansharing.com/oslobysykkel.no/")
+    return(list(data.frame("HTTP Error when fetching JSON from https://gbfs.urbansharing.com/oslobysykkel.no/"), NULL))
   }
+  
+  fetched_at <- station_information$date
   
   # extract data from JSON and unpack
   station_information <- fromJSON(content(station_information, as="text", encoding = "UTF-8"))$data$stations
@@ -63,6 +63,7 @@ fetch_from_api <- function() {
 ### Shiny ###
 ui <- fluidPage(
   titlePanel("Oslo bysykkel station status"),
+  
   sidebarLayout(
     sidebarPanel(
       actionButton("refresh_button",label = "Refresh"),
@@ -77,12 +78,15 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   stations <- fetch_from_api()
+  
+  # make reactive variable with data and fetched_at
   RV <- reactiveValues(data = stations[[1]], timestamp = stations[[2]])
   
   output$text <- renderText(paste("Fetched on: ", RV$timestamp, "GMT"))
   output$author <- renderText("Created by: ogtveit, on: 2019-11-13")
   output$table <- DT::renderDataTable(RV$data, options = list(pageLength = 25))
   
+  # refresh button action (fetch and update reactive values)
   observeEvent(input$refresh_button,{
     stations <- fetch_from_api()
     RV$data <- stations[[1]]
@@ -90,4 +94,5 @@ server <- function(input, output, session) {
   },ignoreInit = TRUE)
 }
 
+# launch shiny server
 shinyApp(ui, server)
