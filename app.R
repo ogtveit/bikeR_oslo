@@ -73,8 +73,6 @@ ui <- fluidPage(
         dataTableOutput("table")
     )
   )
-
-
 )
 
 server <- function(input, output, session) {
@@ -86,8 +84,9 @@ server <- function(input, output, session) {
   output$table <- DT::renderDataTable(RV$data, options = list(pageLength = 25))
   
   observeEvent(input$refresh_button,{
-    RV$data <- fetch_from_api()[[1]]
-    RV$timestamp <- fetch_from_api()[[2]] 
+    stations <- fetch_from_api()
+    RV$data <- stations[[1]]
+    RV$timestamp <- stations[[2]] 
   },ignoreInit = TRUE)
 }
 
