@@ -18,6 +18,8 @@ if (!require('dplyr')) install.packages('dplyr')
 library(httr)
 library(jsonlite)
 library(dplyr)
+library(shiny)
+library(DT)
 
 
 ### Setup ###
@@ -25,7 +27,7 @@ client_header = "ogt-bikeR"
 api_base = "https://gbfs.urbansharing.com/oslobysykkel.no/"
 
 
-### Start ###
+### data-fetch function ###
 fetch_from_api <- function() {
   #' fetch_from_api() gets JSON from api_base
   #' function returns list with two objects: stations, fetched at
@@ -58,18 +60,35 @@ fetch_from_api <- function() {
 }
 
 
-### Shiny output ###
-library(shiny)
-
+### Shiny ###
 ui <- fluidPage(
   titlePanel("Oslo bysykkel station status"),
-  textOutput("text"),
-  tableOutput("static")
+  sidebarLayout(
+    sidebarPanel(
+      actionButton("refresh_button",label = "Refresh"),
+      textOutput("text"),
+      textOutput("author")
+    ),
+    mainPanel(
+        dataTableOutput("table")
+    )
+  )
+
+
 )
 
 server <- function(input, output, session) {
-  output$text <- renderText(paste("Fetched on: ", fetch_from_api()[[2]], "GMT"))
-  output$static <- renderTable(fetch_from_api()[[1]])
+  stations <- fetch_from_api()
+  RV <- reactiveValues(data = stations[[1]], timestamp = stations[[2]])
+  
+  output$text <- renderText(paste("Fetched on: ", RV$timestamp, "GMT"))
+  output$author <- renderText("Created by: ogtveit, on: 2019-11-13")
+  output$table <- DT::renderDataTable(RV$data, options = list(pageLength = 25))
+  
+  observeEvent(input$refresh_button,{
+    RV$data <- fetch_from_api()[[1]]
+    RV$timestamp <- fetch_from_api()[[2]] 
+  },ignoreInit = TRUE)
 }
 
 shinyApp(ui, server)
