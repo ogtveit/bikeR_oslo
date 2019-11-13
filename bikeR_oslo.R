@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript
+#! /usr/bin/env Rscript
 #' bikeR_oslo.R
 #' 
 #' Author: github.com/ogtveit
@@ -8,7 +8,7 @@
 #' API documentation: https://oslobysykkel.no/apne-data/sanntid
 
 
-### Libraries 
+### Libraries ###
 # install libraries if missing
 if (!require('httr')) install.packages('httr')
 if (!require('jsonlite')) install.packages('jsonlite')
@@ -20,24 +20,28 @@ library(jsonlite)
 library(dplyr)
 
 
-### Setup 
-user_agent = "ogt-bikeR"
+### Setup ###
+client_header = "ogt-bikeR"
+api_base = "https://gbfs.urbansharing.com/oslobysykkel.no/"
 
 
-### Get JSON 
-station_information <- GET("https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json",  add_headers("user-agent" = user_agent))
-station_status <- GET("https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json", add_headers("user-agent" = user_agent))
+### Start ###
+# Get JSON 
+station_information <- GET(paste(api_base, "station_information.json", sep=""),  add_headers("client-name" = client_header))
+station_status <- GET(paste(api_base, "station_status.json", sep=""), add_headers("client-name" = client_header))
+
+fetched_at <- station_information$date
 
 # stop if http error
 if (http_error(station_information) | http_error(station_status)) {
-  stop("Could not fetch JSON from https://gbfs.urbansharing.com/oslobysykkel.no/")
+  stop("HTTP Error when fetching JSON from https://gbfs.urbansharing.com/oslobysykkel.no/")
 }
 
-# extract and unpack data from JSON 
+# extract data from JSON and unpack
 station_information <- fromJSON(content(station_information, as="text", encoding = "UTF-8"))$data$stations
 station_status <- fromJSON(content(station_status, as="text", encoding = "UTF-8"))$data$stations
 
-# join information and status tables
+# join information and status
 stations <- left_join(station_information, station_status, by="station_id") %>%
   select(name, num_bikes_available, num_docks_available) %>% # keep only name, free bikes, free dock
   arrange(name) %>% # sort in alphabetic order
@@ -47,3 +51,19 @@ stations <- left_join(station_information, station_status, by="station_id") %>%
 
 # print final output
 stations
+
+### Shiny output ###
+# library(shiny)
+# 
+# ui <- fluidPage(
+#   titlePanel("Oslo bysykkel station status"),
+#   textOutput("text"),
+#   tableOutput("static")
+# )
+# 
+# server <- function(input, output, session) {
+#   output$text <- renderText(paste("Station status fetched at: ", fetched_at))
+#   output$static <- renderTable(stations)
+# }
+# 
+# shinyApp(ui, server)
