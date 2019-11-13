@@ -17,3 +17,7 @@ Run Rscript.exe with bikeR_oslo.R as argument, e.g:
 Open bikeR_oslo.R in RStudio
 Select all lines (CTRL + A)
 Execute selected lines (CTRL + Enter)
+
+## Shiny
+app.R contains Shiny version of script.
+Output of Shiny version can be seen at: https://olegt.shinyapps.io/biker_oslo/ (will only update evry 5 minutes)
