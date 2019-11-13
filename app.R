@@ -23,7 +23,7 @@ library(DT)
 
 
 ### Setup ###
-client_header = "ogt-bikeR"
+client_header = "ogt-bikeR_shiny"
 api_base = "https://gbfs.urbansharing.com/oslobysykkel.no/"
 
 
