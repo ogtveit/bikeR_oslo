@@ -9,6 +9,9 @@ bikeR_oslo have two versions: a [Shiny](https://shiny.rstudio.com/) webapp and a
 
 The R script use the libraries _httr_, _jsonlite_ and _dplyr_. When run it will try to install these if not installed. The Shiny app requires the libraries _shiny_ and _DT_ in addition.
 
+If automatic package installation fails, run in an R session / RStudio:
+> install.packages('dplyr', 'httr', 'jsonlite', 'shiny', 'DT')
+
 ## To run 
 The Shiny webapp is demonstrated at: https://olegt.shinyapps.io/biker_oslo/ 
 
