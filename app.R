@@ -29,6 +29,8 @@ library(DT)
 ### Setup ###
 client_header = "ogt-bikeR_shiny"
 api_base = "https://gbfs.urbansharing.com/oslobysykkel.no/"
+station_information_target <- "station_information.json"
+station_status_target <- "station_status.json"
 
 
 ### data-fetch function ###
@@ -39,8 +41,8 @@ fetch_from_api <- function() {
   #' fetched_at is timestamp of fetch
 
   # Get JSON 
-  station_information <- GET(paste(api_base, "station_information.json", sep=""),  add_headers("client-name" = client_header))
-  station_status <- GET(paste(api_base, "station_status.json", sep=""), add_headers("client-name" = client_header))
+  station_information <- GET(paste(api_base, station_information_target, sep=""),  add_headers("client-name" = client_header))
+  station_status <- GET(paste(api_base, station_status_target, sep=""), add_headers("client-name" = client_header))
   
     # stop if http error
   if (http_error(station_information) | http_error(station_status)) {
