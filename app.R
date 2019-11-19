@@ -1,8 +1,9 @@
 #! /usr/bin/env Rscript
 #' app.R
 #' 
+#' Version 0.2
 #' Author: github.com/ogtveit
-#' Date: 2019-11-12
+#' Date: 2019-11-19
 #' 
 #' Get list of bike-rental stands in oslo and print: name - avaliable bikes - avaliable docks
 #' API documentation: https://oslobysykkel.no/apne-data/sanntid
@@ -10,9 +11,12 @@
 
 ### Libraries ###
 # install libraries if missing
-if (!require('httr')) install.packages('httr')
-if (!require('jsonlite')) install.packages('jsonlite')
-if (!require('dplyr')) install.packages('dplyr')
+if (!require('httr')) install.packages('httr', repos="https://cran.uib.no")
+if (!require('jsonlite')) install.packages('jsonlite', repos="https://cran.uib.no")
+if (!require('dplyr')) install.packages('dplyr', repos="https://cran.uib.no")
+if (!require('shiny')) install.packages('shiny', repos="https://cran.uib.no")
+if (!require('DT')) install.packages('DT', repos="https://cran.uib.no")
+if (!require('leaflet')) install.packages('leaflet', repos="https://cran.uib.no")
 
 # load libraries
 library(httr)
