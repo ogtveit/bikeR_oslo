@@ -33,7 +33,20 @@ station_information_target <- "station_information.json"
 station_status_target <- "station_status.json"
 
 
-### data-fetch function ###
+### Functions ###
+# GET the json from given target
+get_json_from_api <- function(json_target) {
+  fetch <- GET(paste(api_base, json_target, sep=""),  add_headers("Client-Identifier" = client_header))
+  if (http_error(fetch)) stop(paste("HTTP Error when fetching ", json_target))
+  fetch
+}
+
+# extract list of lists from json objects
+extract_from_json <- function(json){
+  fromJSON(content(json, as="text", encoding = "UTF-8"))$data$stations
+}
+
+### main data-fetch function ###
 fetch_from_api <- function() {
   #' fetch_from_api() gets JSON from api_base
   #' function returns list with two objects: stations, fetched at
@@ -41,19 +54,15 @@ fetch_from_api <- function() {
   #' fetched_at is timestamp of fetch
 
   # Get JSON 
-  station_information <- GET(paste(api_base, station_information_target, sep=""),  add_headers("client-name" = client_header))
-  station_status <- GET(paste(api_base, station_status_target, sep=""), add_headers("client-name" = client_header))
+  station_information <- get_json_from_api(station_information_target)
+  station_status <- get_json_from_api(station_status_target)
   
-    # stop if http error
-  if (http_error(station_information) | http_error(station_status)) {
-    return(list(data.frame(paste("HTTP Error when fetching JSON from ", api_base)), NULL))
-  }
-  
+  # save timestamp from _status
   fetched_at <- station_status$date
   
   # extract data from JSON and unpack
-  station_information <- fromJSON(content(station_information, as="text", encoding = "UTF-8"))$data$stations
-  station_status <- fromJSON(content(station_status, as="text", encoding = "UTF-8"))$data$stations
+  station_information <- extract_from_json(station_information)
+  station_status <- extract_from_json(station_status)
   
   # join information and status
   stations <- left_join(station_information, station_status, by="station_id") %>%
