@@ -1,6 +1,7 @@
 #! /usr/bin/env Rscript
 #' bikeR_oslo.R
 #' 
+#' Version: 0.2
 #' Author: github.com/ogtveit
 #' Date: 2019-11-12
 #' 
@@ -23,24 +24,35 @@ library(dplyr)
 ### Setup ###
 client_header = "ogt-bikeR"
 api_base = "https://gbfs.urbansharing.com/oslobysykkel.no/"
+station_information_target <- "station_information.json"
+station_status_target <- "station_status.json"
 
+
+### Functions ###
+# GET the json from given target
+get_json_from_api <- function(json_target) {
+  fetch <- GET(paste(api_base, json_target, sep=""),  add_headers("Client-Identifier" = client_header))
+  if (http_error(fetch)) stop(paste("HTTP Error when fetching ", json_target))
+  fetch
+}
+
+# extract list of lists from json objects
+extract_from_json <- function(json){
+  fromJSON(content(json, as="text", encoding = "UTF-8"))$data$stations
+}
 
 ### Start ###
 # Get JSON 
-station_information <- GET(paste(api_base, "station_information.json", sep=""),  add_headers("Client-Identifier" = client_header))
-station_status <- GET(paste(api_base, "station_status.json", sep=""), add_headers("Client-Identifier" = client_header))
+station_information <- get_json_from_api(station_information_target)
+station_status <- get_json_from_api(station_status_target)
 
-# stop if http error
-if (http_error(station_information) | http_error(station_status)) {
-  stop("HTTP Error when fetching JSON from https://gbfs.urbansharing.com/oslobysykkel.no/")
-}
 
 # get fetch timestamp
 fetched_at <- station_information$date
 
-# extract and unpack station data from JSON
-station_information <- fromJSON(content(station_information, as="text", encoding = "UTF-8"))$data$stations
-station_status <- fromJSON(content(station_status, as="text", encoding = "UTF-8"))$data$stations
+# extract data from JSON and unpack
+station_information <- extract_from_json(station_information)
+station_status <- extract_from_json(station_status)
 
 # join information and status
 stations <- left_join(station_information, station_status, by="station_id") %>%
@@ -51,5 +63,5 @@ stations <- left_join(station_information, station_status, by="station_id") %>%
          "Avaliable docks" = num_docks_available)
 
 # print final output
-print(paste("Oslo bysykkel station status, fetched on:", fetched_at, "GMT"))
+print(paste("Oslo bysykkel station status, data updated:", fetched_at, "GMT"))
 print(stations)
