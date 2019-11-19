@@ -46,7 +46,7 @@ fetch_from_api <- function() {
   
     # stop if http error
   if (http_error(station_information) | http_error(station_status)) {
-    return(list(data.frame("HTTP Error when fetching JSON from https://gbfs.urbansharing.com/oslobysykkel.no/"), NULL))
+    return(list(data.frame(paste("HTTP Error when fetching JSON from ", api_base)), NULL))
   }
   
   fetched_at <- station_status$date
