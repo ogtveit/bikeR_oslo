@@ -49,7 +49,7 @@ fetch_from_api <- function() {
     return(list(data.frame("HTTP Error when fetching JSON from https://gbfs.urbansharing.com/oslobysykkel.no/"), NULL))
   }
   
-  fetched_at <- station_information$date
+  fetched_at <- station_status$date
   
   # extract data from JSON and unpack
   station_information <- fromJSON(content(station_information, as="text", encoding = "UTF-8"))$data$stations
