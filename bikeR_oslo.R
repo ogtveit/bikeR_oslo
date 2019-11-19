@@ -27,8 +27,8 @@ api_base = "https://gbfs.urbansharing.com/oslobysykkel.no/"
 
 ### Start ###
 # Get JSON 
-station_information <- GET(paste(api_base, "station_information.json", sep=""),  add_headers("client-name" = client_header))
-station_status <- GET(paste(api_base, "station_status.json", sep=""), add_headers("client-name" = client_header))
+station_information <- GET(paste(api_base, "station_information.json", sep=""),  add_headers("Client-Identifier" = client_header))
+station_status <- GET(paste(api_base, "station_status.json", sep=""), add_headers("Client-Identifier" = client_header))
 
 # stop if http error
 if (http_error(station_information) | http_error(station_status)) {
