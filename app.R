@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript
 #' app.R
 #' 
-#' Version 0.2
+#' Version: 0.2
 #' Author: github.com/ogtveit
 #' Date: 2019-11-19
 #' 
@@ -15,7 +15,6 @@ if (!require('httr')) install.packages('httr', repos="https://cran.uib.no")
 if (!require('jsonlite')) install.packages('jsonlite', repos="https://cran.uib.no")
 if (!require('dplyr')) install.packages('dplyr', repos="https://cran.uib.no")
 if (!require('shiny')) install.packages('shiny', repos="https://cran.uib.no")
-if (!require('DT')) install.packages('DT', repos="https://cran.uib.no")
 if (!require('leaflet')) install.packages('leaflet', repos="https://cran.uib.no")
 
 # load libraries
@@ -23,7 +22,7 @@ library(httr)
 library(jsonlite)
 library(dplyr)
 library(shiny)
-library(DT)
+library(leaflet)
 
 
 ### Setup ###
@@ -66,18 +65,15 @@ fetch_from_api <- function() {
   
   # join information and status
   stations <- left_join(station_information, station_status, by="station_id") %>%
-    select(name, num_bikes_available, num_docks_available) %>% # keep only name, free bikes, free dock
-    arrange(name) %>% # sort in alphabetic order
-    rename("Station" = name, # relabel columns
-           "Avaliable bikes" = num_bikes_available, 
-           "Avaliable docks" = num_docks_available)
+    select(name, num_bikes_available, num_docks_available, lat, lon) # keep only name, free bikes, free dock # v.2 lat,lon
+  
   list(stations, fetched_at)
 }
 
 
 ### Shiny ###
 ui <- fluidPage(
-  titlePanel("Oslo bysykkel station status"),
+  titlePanel("Oslo bysykkel station status version 0.2"),
   
   sidebarLayout(
     sidebarPanel(
@@ -86,16 +82,52 @@ ui <- fluidPage(
       textOutput("author")
     ),
     mainPanel(
-        dataTableOutput("table")
+        leafletOutput("bike_station_map")
     )
   )
 )
 
 server <- function(input, output, session) {
   stations <- fetch_from_api()
+  fetched <- format(stations[[2]], format = "%Y-%m-%d %H:%M:%S", tz = "Europe/Oslo")
+  stations <- stations[[1]]
   
   # make reactive variable with data and fetched_at
-  RV <- reactiveValues(data = stations[[1]], timestamp = stations[[2]])
+  RV <- reactiveValues(data = stations, timestamp = fetched, toofast = NULL)  
+  
+  # function for iconset -  color markers according to avaliable bikes
+  create_icons <- function(bikelist){
+    awesomeIcons( 
+      icon = 'bicycle',
+      iconColor = 'black',
+      library = 'fa', 
+      markerColor = ifelse(
+        bikelist >0, 
+        'green', 
+        'red')
+    )
+  }
+  
+  # create iconset
+  icons <- create_icons(stations$num_bikes_available)
+  
+  # render leaflet map in mainpanel
+  output$bike_station_map <- renderLeaflet({
+    leaflet(RV$data) %>%
+      fitBounds(~min(lon), ~min(lat), ~max(lon), ~max(lat)) %>%
+      addTiles() %>%
+      addAwesomeMarkers(
+        lng = ~lon, 
+        lat = ~lat,
+        popup = ~paste('<b>',name,'</b><br />',
+                       'Free bikes: ', num_bikes_available,'<br />',
+                       'Free docks: ', num_docks_available),
+        icon=icons
+      )
+  })
+  
+  # reactive text field in sidebar
+  output$text <- renderText(paste("Data updated at: ", RV$timestamp))
   
   output$text <- renderText(paste("Fetched on: ", RV$timestamp, "GMT"))
   output$author <- renderText("Created by: ogtveit, on: 2019-11-13")
