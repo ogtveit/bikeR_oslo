@@ -109,6 +109,7 @@ server <- function(input, output, session) {
         group = "station_markers",
         lng = ~lon, 
         lat = ~lat,
+        label = ~paste(name,' Free bikes: ', num_bikes_available,' Free docks: ', num_docks_available),
         popup = ~paste('<b>',name,'</b><br />',
                        'Free bikes: ', num_bikes_available,'<br />',
                        'Free docks: ', num_docks_available),
@@ -137,7 +138,7 @@ server <- function(input, output, session) {
       # update icons object, with colors that fit bike avaliability
       icons <- create_icons(stations[[1]]$num_bikes_available)
       
-      # update map with new markers
+      # update map with new markers (and colors)
       updated_map <- leafletProxy('bike_station_map', data = RV$data) %>%
         removeMarker(layerId = RV$markerIds) %>%
         addAwesomeMarkers(
@@ -145,6 +146,7 @@ server <- function(input, output, session) {
           group = "station_markers",
           lng = ~lon, 
           lat = ~lat,
+          label = ~paste(name,' Free bikes: ', num_bikes_available,' Free docks: ', num_docks_available),
           popup = ~paste('<b>',name,'</b><br />',
                          'Free bikes: ', num_bikes_available,'<br />',
                          'Free docks: ', num_docks_available),
@@ -152,7 +154,7 @@ server <- function(input, output, session) {
       
       # re-add geolocation marker, if geolocation avaliable
       if (isTRUE(input$geolocation)) (
-        addMarkers(updated_map, layerId = "geo_marker", lat = input$lat, lng = input$long)
+        addMarkers(updated_map, layerId = "geo_marker", lat = input$lat, lng = input$long, label = "Your location")
       )
       
       } 
@@ -166,7 +168,7 @@ server <- function(input, output, session) {
   observe({
     if(isTRUE(input$geolocation)) (
       leafletProxy("bike_station_map") %>%
-        addMarkers(layerId = "geo_marker", lat = input$lat, lng = input$long)
+        addMarkers(layerId = "geo_marker", lat = input$lat, lng = input$long, label = "Your location")
     )
   })
 }
