@@ -1,4 +1,4 @@
-# bikeR_oslo
+# bikeR_oslo version 0.2
 
 R script to fetch and show all Oslo bysykkel stations, along with avaliable bikes and free bike docks for each. Utilizes the API described here: https://oslobysykkel.no/apne-data/sanntid
 
@@ -7,7 +7,7 @@ bikeR_oslo have two versions: a [Shiny](https://shiny.rstudio.com/) webapp and a
 - app.R contains the Shiny version, will start the server when run
 - bikeR_oslo.R contains a simple script that can run in a terminal
 
-The R script use the libraries _httr_, _jsonlite_ and _dplyr_. When run it will try to install these if not installed. The Shiny app requires the libraries _shiny_ and _DT_ in addition.
+The R script use the libraries _httr_, _jsonlite_ and _dplyr_. When run it will try to install these if not installed. The Shiny app requires the libraries _shiny_ _leaflet_ in addition.
 
 If automatic package installation fails, run in an R session / RStudio:
 > install.packages('dplyr', 'httr', 'jsonlite', 'shiny', 'DT')
