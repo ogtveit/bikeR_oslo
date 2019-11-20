@@ -55,7 +55,7 @@ server <- function(input, output, session) {
   stations <- stations[[1]]
   
   # make reactive variable with data and fetched_at
-  RV <- reactiveValues(data = stations, timestamp = fetched, toofast = NULL)  
+  RV <- reactiveValues(data = stations, timestamp = fetched, toofast = NULL, markerIds = stations$station_id)  
   
   # function for iconset -  color markers according to avaliable bikes
   create_icons <- function(bikelist){
@@ -78,6 +78,7 @@ server <- function(input, output, session) {
       fitBounds(~min(lon), ~min(lat), ~max(lon), ~max(lat)) %>%
       addTiles() %>%
       addAwesomeMarkers(
+        layerId = ~RV$markerIds,
         lng = ~lon, 
         lat = ~lat,
         popup = ~paste('<b>',name,'</b><br />',
@@ -99,7 +100,23 @@ server <- function(input, output, session) {
       RV$data <- stations[[1]] # update reactive data
       RV$timestamp <- format(stations[[2]], format = "%Y-%m-%d %H:%M:%S", tz = "Europe/Oslo")
       RV$toofast <- NULL # remove "too fast" message
-      icons <- create_icons(stations[[1]]$num_bikes_available) # update colors
+      RV$markerIds <- stations[[1]]$station_id
+      
+      # update icons object, with colors that fit bike avaliability
+      icons <- create_icons(stations[[1]]$num_bikes_available)
+      
+      # update map with new markers
+      leafletProxy('bike_station_map', data = RV$data) %>%
+        removeMarker(layerId = RV$markerIds) %>%
+        addAwesomeMarkers(
+          layerId = ~RV$markerIds,
+          lng = ~lon, 
+          lat = ~lat,
+          popup = ~paste('<b>',name,'</b><br />',
+                         'Free bikes: ', num_bikes_available,'<br />',
+                         'Free docks: ', num_docks_available),
+          icon=icons)
+      
       } 
     else {
       RV$toofast <- "Warning: refreshed too fast! (<10s)<br />"
