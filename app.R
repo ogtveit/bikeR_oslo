@@ -75,11 +75,13 @@ fetch_from_api <- function() {
 ui <- fluidPage(
   titlePanel("Oslo bysykkel station status version 0.2"),
   
-  sidebarLayout(
+  sidebarLayout(position = 'right',
     sidebarPanel(
       actionButton("refresh_button",label = "Refresh"),
+      p(),
       textOutput("text"),
-      textOutput("author")
+      p(),
+      htmlOutput("author")
     ),
     mainPanel(
         leafletOutput("bike_station_map")
@@ -88,6 +90,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+  # fetch from api on server start
   stations <- fetch_from_api()
   fetched <- format(stations[[2]], format = "%Y-%m-%d %H:%M:%S", tz = "Europe/Oslo")
   stations <- stations[[1]]
@@ -129,9 +132,8 @@ server <- function(input, output, session) {
   # reactive text field in sidebar
   output$text <- renderText(paste("Data updated at: ", RV$timestamp))
   
-  output$text <- renderText(paste("Fetched on: ", RV$timestamp, "GMT"))
-  output$author <- renderText("Created by: ogtveit, on: 2019-11-13")
-  output$table <- DT::renderDataTable(RV$data, options = list(pageLength = 25))
+  # static html area in sidebar
+  output$author <- renderUI(HTML(paste(RV$toofast, "Created by: ogtveit<br />Created on: 2019-11-19")) )
   
   # refresh button action (fetch and update reactive values)
   observeEvent(input$refresh_button,{
