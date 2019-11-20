@@ -15,14 +15,8 @@ if (!require('httr')) install.packages('httr', repos="https://cran.uib.no")
 if (!require('jsonlite')) install.packages('jsonlite', repos="https://cran.uib.no")
 if (!require('dplyr')) install.packages('dplyr', repos="https://cran.uib.no")
 if (!require('shiny')) install.packages('shiny', repos="https://cran.uib.no")
+if (!require('shinydashboard')) install.packages('shinydashboard', repos="https://cran.uib.no")
 if (!require('leaflet')) install.packages('leaflet', repos="https://cran.uib.no")
-
-# load libraries
-library(httr)
-library(jsonlite)
-library(dplyr)
-library(shiny)
-library(leaflet)
 
 
 ### Setup ###

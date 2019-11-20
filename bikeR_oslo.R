@@ -10,15 +10,10 @@
 
 
 ### Libraries ###
-# install libraries if missing
+# load libraries, install if missing
 if (!require('httr')) install.packages('httr', repos="https://cran.uib.no")
 if (!require('jsonlite')) install.packages('jsonlite', repos="https://cran.uib.no")
 if (!require('dplyr')) install.packages('dplyr', repos="https://cran.uib.no")
-
-# load libraries
-library(httr)
-library(jsonlite)
-library(dplyr)
 
 
 ### Setup ###
