@@ -7,7 +7,7 @@ bikeR_oslo have two versions: a [Shiny](https://shiny.rstudio.com/) webapp and a
 - app.R contains the Shiny version, will start the server when run
 - bikeR_oslo.R contains a simple script that can run in a terminal
 
-The R script use the libraries _httr_, _jsonlite_ and _dplyr_. When run it will try to install these if not installed. The Shiny app requires the libraries _shiny_, _shinydashboard_ and _leaflet_ in addition. For testing _testthat_, _here_, and _httptest_ is required.
+The R script use the libraries _httr_, _jsonlite_ and _dplyr_. When run it will try to install these if not installed. The Shiny app requires the libraries _shiny_, _shinydashboard_ and _leaflet_ in addition. 
 
 If automatic package installation fails, run in an R session / RStudio:
 > install.packages('dplyr', 'httr', 'jsonlite', 'shiny', 'shinydashboard', 'leaflet')
@@ -29,7 +29,7 @@ With R installed, run Rscript.exe / Rscript with bikeR_oslo.R or app.R as argume
 
 ## Testing
 
-Testing requires the libraries _testthat_ and _httptest_. To run all tests execute '.\tests\testthat.R'. Either open tests/testthat.R in RStudio and run all (CTRL + SHIFT + Enter), or:
+Testing requires the libraries _testthat_, _here_ and _httptest_. To run all tests execute '.\tests\testthat.R'. Either open tests/testthat.R in RStudio and run all (CTRL + SHIFT + Enter), or run in terminal:
 
 > C:\\"Program Files"\R\R-3.6.1\bin\Rscript.exe \path\to\script\tests\testthat.R
 
