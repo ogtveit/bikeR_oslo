@@ -87,14 +87,14 @@ server <- function(input, output, session) {
   )})
   
   # reactive text field in sidebar
-  output$text <- renderText(paste("Data updated at: ", RV$timestamp))
+  output$text <- renderText(paste("Data updated at: ", RV$timestamp, "CET"))
   
   # static html area in sidebar
   output$author <- renderUI(HTML(paste(RV$toofast, "Created by: ogtveit<br />Created on: 2019-11-19")) )
   
   # refresh button action (fetch and update reactive variables; if not too fast)
   observeEvent(input$refresh_button,{
-    if (difftime(Sys.time(),RV$timestamp, units="secs") >= 10){ # only fetch new data is >= 10 seconds since last 
+    if (difftime(format(Sys.time(), tz="Europe/Oslo"),RV$timestamp, units="secs") >= 10){ # only fetch new data is >= 10 seconds since last 
       stations <- fetch_from_api() # fetch from api
       RV$data <- stations[[1]] # update reactive data
       RV$timestamp <- format(stations[[2]], format = "%Y-%m-%d %H:%M:%S", tz = "Europe/Oslo")
