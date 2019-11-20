@@ -135,11 +135,18 @@ server <- function(input, output, session) {
   # static html area in sidebar
   output$author <- renderUI(HTML(paste(RV$toofast, "Created by: ogtveit<br />Created on: 2019-11-19")) )
   
-  # refresh button action (fetch and update reactive values)
+  # refresh button action (fetch and update reactive variables; if not too fast)
   observeEvent(input$refresh_button,{
-    stations <- fetch_from_api()
-    RV$data <- stations[[1]]
-    RV$timestamp <- stations[[2]] 
+    if (difftime(Sys.time(),RV$timestamp, units="secs") >= 10){ # only fetch new data is >= 10 seconds since last 
+      stations <- fetch_from_api() # fetch from api
+      RV$data <- stations[[1]] # update reactive data
+      RV$timestamp <- format(stations[[2]], format = "%Y-%m-%d %H:%M:%S", tz = "Europe/Oslo")
+      RV$toofast <- NULL # remove "too fast" message
+      icons <- create_icons(stations[[1]]$num_bikes_available) # update colors
+      } 
+    else {
+      RV$toofast <- "Warning: refreshed too fast! (<10s)<br />"
+    }
   },ignoreInit = TRUE)
 }
 
