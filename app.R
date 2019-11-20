@@ -42,8 +42,7 @@ ui <- dashboardPage(
     htmlOutput("author")
   ),
   dashboardBody(
-    tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;}"),
-    leafletOutput("bike_station_map")
+    leafletOutput("bike_station_map", height = "calc(100vh - 80px)")
   )
 )
   
