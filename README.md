@@ -15,14 +15,12 @@ If automatic package installation fails, run in an R session / RStudio:
 ## To run 
 The Shiny webapp is demonstrated at: https://olegt.shinyapps.io/biker_oslo/ 
 
-### RStudio
+#### RStudio
 Open bikeR_oslo.R or app.R in [RStudio](https://rstudio.com/)
 
-Select all lines (CTRL + A)
+Execute all lines (CTRL + SHIFT + Enter)
 
-Execute selected lines (CTRL + Enter)
-
-### Windows / UNIX terminal
+#### Windows / UNIX terminal
 With R installed, run Rscript.exe / Rscript with bikeR_oslo.R or app.R as argument, e.g:
 
 > C:\\"Program Files"\R\R-3.6.1\bin\Rscript.exe \path\to\script\bikeR_oslo.R
