@@ -29,18 +29,43 @@ station_status_target <- "station_status.json"
 ### Load functions ###
 source("./bikeR_functions.R", local = TRUE)
 
+# geolocation js-script
+# https://github.com/AugustT/shiny_geolocation
+geolocation_js <- '
+      $(document).ready(function () {
+        navigator.geolocation.getCurrentPosition(onSuccess, onError);
+              
+        function onError (err) {
+          Shiny.onInputChange("geolocation", false);
+        }
+              
+        function onSuccess (position) {
+          setTimeout(function () {
+            var coords = position.coords;
+            console.log(coords.latitude + ", " + coords.longitude);
+            Shiny.onInputChange("geolocation", true);
+            Shiny.onInputChange("lat", coords.latitude);
+            Shiny.onInputChange("long", coords.longitude);
+          }, 1100)
+        }
+      });
+              '
+
 
 ### Shiny ###
 ## Shiny UI setup ##
 ui <- dashboardPage(
   dashboardHeader(title = "Oslo bysykkel station status version 0.2"),
+  
   dashboardSidebar(
-    actionButton("refresh_button",label = "Refresh"),
+    actionButton("refresh_button",label = "Reload API"),
     p(),
     textOutput("text"),
     p(),
-    htmlOutput("author")
+    htmlOutput("author"),
+    tags$script(geolocation_js)
   ),
+  
   dashboardBody(
     leafletOutput("bike_station_map", height = "calc(100vh - 80px)")
   )
@@ -72,20 +97,22 @@ server <- function(input, output, session) {
   # create iconset
   icons <- create_icons(stations$num_bikes_available)
   
-  # render leaflet map in mainpanel
+  # render leaflet map in dashboardBody
   output$bike_station_map <- renderLeaflet({
     leaflet(RV$data) %>%
       fitBounds(~min(lon), ~min(lat), ~max(lon), ~max(lat)) %>%
       addTiles() %>%
-      addAwesomeMarkers(
+      # add markers at bike station coordinates:
+      addAwesomeMarkers( 
         layerId = ~RV$markerIds,
         lng = ~lon, 
         lat = ~lat,
         popup = ~paste('<b>',name,'</b><br />',
                        'Free bikes: ', num_bikes_available,'<br />',
                        'Free docks: ', num_docks_available),
-        icon=icons
-  )})
+        icon=icons # <- using green/red colors created above
+        )
+    })
   
   # reactive text field in sidebar
   output$text <- renderText(paste("Data updated at: ", strftime(RV$timestamp, format = "%H:%M:%S", tz = "Europe/Oslo"), "CET"))
@@ -95,12 +122,15 @@ server <- function(input, output, session) {
   
   # refresh button action (fetch and update reactive variables; if not too fast)
   observeEvent(input$refresh_button,{
-    if (difftime(format(Sys.time(), tz="Europe/Oslo"),RV$timestamp, units="secs") >= 10){ # only fetch new data is >= 10 seconds since last 
-      stations <- fetch_from_api() # fetch from api
-      RV$data <- stations[[1]] # update reactive data
+    # only fetch new data is >= 10 seconds since last:
+    if (difftime(format(Sys.time(), tz="Europe/Oslo"),RV$timestamp, units="secs") >= 10){ 
+      
+      # fetch from api and update reactive variable
+      stations <- fetch_from_api()
+      RV$data <- stations[[1]]
       RV$timestamp <- format(stations[[2]], format = "%Y-%m-%d %H:%M:%S", tz = "Europe/Oslo")
       RV$toofast <- NULL # remove "too fast" message
-      RV$markerIds <- stations[[1]]$station_id
+      RV$markerIds <- stations[[1]]$station_id # IF station_ids change
       
       # update icons object, with colors that fit bike avaliability
       icons <- create_icons(stations[[1]]$num_bikes_available)
@@ -119,9 +149,18 @@ server <- function(input, output, session) {
       
       } 
     else {
+      # if <10s since last API timestam
       RV$toofast <- "Warning: refreshed too fast! (<10s)<br />"
     }
   },ignoreInit = TRUE)
+  
+  # when (if ever) geolocation is avaliable:
+  observe({
+    if(isTRUE(input$geolocation)) (
+      leafletProxy("bike_station_map") %>%
+        addMarkers(layerId = "geo_marker", lat = input$lat, lng = input$long)
+    )
+  })
 }
 
 # launch shiny server
