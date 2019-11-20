@@ -3,11 +3,11 @@
 #' test regime for bikeR_oslo
 #' test functions in bikeR_functions.R
 
-library(httr)
-library(jsonlite)
-library(testthat)
-library(here)
-library(httptest)
+if (!require('httr')) install.packages('httr', repos="https://cran.uib.no")
+if (!require('jsonlite')) install.packages('jsonlite', repos="https://cran.uib.no")
+if (!require('testthat')) install.packages('testthat', repos="https://cran.uib.no")
+if (!require('here')) install.packages('here', repos="https://cran.uib.no")
+if (!require('httptest')) install.packages('httptest', repos="https://cran.uib.no")
 
 ### Test setup ###
 client_header = "ogt-bikeR_test"
