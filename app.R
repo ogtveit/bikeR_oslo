@@ -26,27 +26,29 @@ station_information_target <- "station_information.json"
 station_status_target <- "station_status.json"
 
 
-### Functions ###
+### Load functions ###
 source("./bikeR_functions.R", local = TRUE)
 
+
 ### Shiny ###
-ui <- fluidPage(
-  titlePanel("Oslo bysykkel station status version 0.2"),
-  
-  sidebarLayout(position = 'right',
-    sidebarPanel(
-      actionButton("refresh_button",label = "Refresh"),
-      p(),
-      textOutput("text"),
-      p(),
-      htmlOutput("author")
-    ),
-    mainPanel(
-        leafletOutput("bike_station_map")
-    )
+## Shiny UI setup ##
+ui <- dashboardPage(
+  dashboardHeader(title = "Oslo bysykkel station status version 0.2"),
+  dashboardSidebar(
+    actionButton("refresh_button",label = "Refresh"),
+    p(),
+    textOutput("text"),
+    p(),
+    htmlOutput("author")
+  ),
+  dashboardBody(
+    tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;}"),
+    leafletOutput("bike_station_map")
   )
 )
-
+  
+  
+## Shiny server setup ##
 server <- function(input, output, session) {
   # fetch from api on server start
   stations <- fetch_from_api()
@@ -66,8 +68,7 @@ server <- function(input, output, session) {
         bikelist >0, 
         'green', 
         'red')
-    )
-  }
+  )}
   
   # create iconset
   icons <- create_icons(stations$num_bikes_available)
@@ -84,8 +85,7 @@ server <- function(input, output, session) {
                        'Free bikes: ', num_bikes_available,'<br />',
                        'Free docks: ', num_docks_available),
         icon=icons
-      )
-  })
+  )})
   
   # reactive text field in sidebar
   output$text <- renderText(paste("Data updated at: ", RV$timestamp))
