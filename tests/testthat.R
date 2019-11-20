@@ -1,3 +1,8 @@
+#! /usr/bin/env Rscript
+
+#' test regime for bikeR_oslo
+#' test functions in bikeR_functions.R
+
 library(httr)
 library(jsonlite)
 library(testthat)
