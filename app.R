@@ -3,7 +3,7 @@
 #' 
 #' Version: 0.2
 #' Author: github.com/ogtveit
-#' Date: 2019-11-19
+#' Date: 2019-11-20
 #' 
 #' Get list of bike-rental stands in oslo and print: name - avaliable bikes - avaliable docks
 #' API documentation: https://oslobysykkel.no/apne-data/sanntid
@@ -88,10 +88,10 @@ server <- function(input, output, session) {
   )})
   
   # reactive text field in sidebar
-  output$text <- renderText(paste("Data updated at: ", RV$timestamp, "CET"))
+  output$text <- renderText(paste("Data updated at: ", strftime(RV$timestamp, format = "%H:%M:%S", tz = "Europe/Oslo"), "CET"))
   
   # static html area in sidebar
-  output$author <- renderUI(HTML(paste(RV$toofast, "Created by: ogtveit<br />Created on: 2019-11-19")) )
+  output$author <- renderUI(HTML(paste(RV$toofast, "Created by: ogtveit<br />Created on: 2019-11-20")) )
   
   # refresh button action (fetch and update reactive variables; if not too fast)
   observeEvent(input$refresh_button,{
