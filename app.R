@@ -63,6 +63,7 @@ ui <- dashboardPage(
     textOutput("text"),
     p(),
     htmlOutput("author"),
+    # add in geolocation-js:
     tags$script(geolocation_js)
   ),
   
@@ -104,7 +105,8 @@ server <- function(input, output, session) {
       addTiles() %>%
       # add markers at bike station coordinates:
       addAwesomeMarkers( 
-        layerId = ~RV$markerIds,
+        layerId = RV$markerIds,
+        group = "station_markers",
         lng = ~lon, 
         lat = ~lat,
         popup = ~paste('<b>',name,'</b><br />',
@@ -136,16 +138,22 @@ server <- function(input, output, session) {
       icons <- create_icons(stations[[1]]$num_bikes_available)
       
       # update map with new markers
-      leafletProxy('bike_station_map', data = RV$data) %>%
+      updated_map <- leafletProxy('bike_station_map', data = RV$data) %>%
         removeMarker(layerId = RV$markerIds) %>%
         addAwesomeMarkers(
-          layerId = ~RV$markerIds,
+          layerId = RV$markerIds,
+          group = "station_markers",
           lng = ~lon, 
           lat = ~lat,
           popup = ~paste('<b>',name,'</b><br />',
                          'Free bikes: ', num_bikes_available,'<br />',
                          'Free docks: ', num_docks_available),
           icon=icons)
+      
+      # re-add geolocation marker, if geolocation avaliable
+      if (isTRUE(input$geolocation)) (
+        addMarkers(updated_map, layerId = "geo_marker", lat = input$lat, lng = input$long)
+      )
       
       } 
     else {
