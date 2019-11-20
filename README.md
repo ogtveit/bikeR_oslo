@@ -28,3 +28,11 @@ With R installed, run Rscript.exe / Rscript with bikeR_oslo.R or app.R as argume
 > C:\\"Program Files"\R\R-3.6.1\bin\Rscript.exe \path\to\script\bikeR_oslo.R
 
 > /usr/bin/env Rscript path/to/bikeR_oslo.R
+
+## Testing
+
+Testing requires the libraries _testthat_ and _httptest_. To run all tests execute '.\tests\testthat.R'. Either open tests/testthat.R in RStudio and run all (CTRL + SHIFT + Enter), or:
+
+> C:\\"Program Files"\R\R-3.6.1\bin\Rscript.exe \path\to\script\tests\testthat.R
+
+> /usr/bin/env Rscript path/to/tests/testthat.R
