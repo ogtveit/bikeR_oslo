@@ -32,7 +32,7 @@ fetch_from_api <- function() {
   
   # join information and status
   stations <- left_join(station_information, station_status, by="station_id") %>%
-    select(name, num_bikes_available, num_docks_available, lat, lon) # keep only name, free bikes, free dock
+    select(station_id, name, num_bikes_available, num_docks_available, lat, lon) # keep only name, free bikes, free dock
   
   list(stations, fetched_at)
 }

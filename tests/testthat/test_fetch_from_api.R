@@ -12,6 +12,6 @@ test_that("returns list with data.frame and posixct",{
 
 # return[[1]]: name, num_bikes_available, num_docks_available, lat,lon
 test_that("data.frame have correct columns",{ 
-  expect_equal(colnames(fetch_from_api()[[1]]), c("name", "num_bikes_available", "num_docks_available", "lat", "lon"))
+  expect_equal(colnames(fetch_from_api()[[1]]), c("station_id", "name", "num_bikes_available", "num_docks_available", "lat", "lon"))
 })
 

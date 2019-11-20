@@ -33,7 +33,7 @@ stations <- stations[[1]]
 
 # arrange and format output
 stations <- stations %>%
-  select(-lat, -lon) %>%
+  select(-station_id, -lat, -lon) %>%
   arrange(name) %>% # sort in alphabetic order
   rename("Station" = name, # relabel columns
          "Avaliable bikes" = num_bikes_available, 
