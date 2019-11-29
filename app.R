@@ -5,7 +5,7 @@
 #' Author: github.com/ogtveit
 #' Date: 2019-11-20
 #' 
-#' Get list of bike-rental stands in oslo and print: name - avaliable bikes - avaliable docks
+#' Get list of bike-rental stands in oslo and output results in leaflet map trough shiny
 #' API documentation: https://oslobysykkel.no/apne-data/sanntid
 
 
