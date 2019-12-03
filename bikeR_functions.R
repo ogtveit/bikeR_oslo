@@ -1,4 +1,4 @@
-# bike_functions.R
+# bikeR_functions.R
 
 # GET the json from given target
 get_json_from_api <- function(json_target) {
@@ -10,6 +10,11 @@ get_json_from_api <- function(json_target) {
 # extract list of lists from json objects
 extract_from_json <- function(json){
   fromJSON(content(json, as="text", encoding = "UTF-8"))$data$stations
+}
+
+join_tables <- function(json1, json2) {
+  left_join(json1, json2, by="station_id") %>% 
+    select(station_id, name, num_bikes_available, num_docks_available, lat, lon)# keep only name, free bikes, free dock
 }
 
 ### main data-fetch function ###
@@ -31,8 +36,7 @@ fetch_from_api <- function() {
   station_status <- extract_from_json(station_status)
   
   # join information and status
-  stations <- left_join(station_information, station_status, by="station_id") %>%
-    select(station_id, name, num_bikes_available, num_docks_available, lat, lon) # keep only name, free bikes, free dock
+  stations <- join_tables(station_information, station_status) 
   
   list(stations, fetched_at)
 }
