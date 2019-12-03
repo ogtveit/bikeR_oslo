@@ -5,6 +5,7 @@
 
 if (!require('httr')) install.packages('httr', repos="https://cran.uib.no")
 if (!require('jsonlite')) install.packages('jsonlite', repos="https://cran.uib.no")
+if (!require('dplyr')) install.packages('dplyr', repos="https://cran.uib.no")
 if (!require('testthat')) install.packages('testthat', repos="https://cran.uib.no")
 if (!require('here')) install.packages('here', repos="https://cran.uib.no")
 if (!require('httptest')) install.packages('httptest', repos="https://cran.uib.no")
@@ -17,3 +18,4 @@ station_status_target <- "station_status.json"
 
 source(here("bikeR_functions.R"))
 test_results <- test_dir("tests/testthat", reporter = "summary", stop_on_failure = TRUE)
+
